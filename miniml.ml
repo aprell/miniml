@@ -1,0 +1,128 @@
+open Ast
+
+let apply = function
+  | "+",  VInt a, VInt b -> VInt (a + b)
+  | "-",  VInt a, VInt b -> VInt (a - b)
+  | "*",  VInt a, VInt b -> VInt (a * b)
+  | "/",  VInt a, VInt b -> VInt (a / b)
+  | "=",  VInt a, VInt b -> VBool (a = b)
+  | "<>", VInt a, VInt b -> VBool (a <> b)
+  | "<",  VInt a, VInt b -> VBool (a < b)
+  | ">",  VInt a, VInt b -> VBool (a > b)
+  | "<=", VInt a, VInt b -> VBool (a <= b)
+  | ">=", VInt a, VInt b -> VBool (a >= b)
+  | _ -> failwith "Invalid expression"
+
+let lookup = List.assoc
+
+let rec interpret env = function
+  | Int n -> VInt n
+  | Bool n -> VBool n
+  | Var x -> !(lookup x env)
+  | Binop (op, e1, e2) ->
+    let e1' = interpret env e1 in
+    let e2' = interpret env e2 in
+    apply (op, e1', e2')
+  | Let (x, e1, e2) ->
+    let e1' = interpret env e1 in
+    interpret ((x, ref e1') :: env) e2
+  | Letrec (x, e1, e2) ->
+    (* Bind x to dummy value *)
+    let env' = ((x, ref (VBool false)) :: env) in
+    let e1' = interpret env' e1 in
+    (* Backpatch x with function closure *)
+    lookup x env' := e1';
+    interpret env' e2
+  | If (e1, e2, e3) ->
+    let e1' = interpret env e1 in
+    begin match e1' with
+      | VBool true -> interpret env e2
+      | _ -> interpret env e3
+    end
+  | Fun (x, e) -> VFun (x, e, env)
+  | App (e1, e2) ->
+    let e1' = interpret env e1 in
+    let e2' = interpret env e2 in
+    begin match e1' with
+      | VFun (x, e, env) -> interpret ((x, ref e2') :: env) e
+      | _ -> failwith "Not a function"
+    end
+
+let rec compile = function
+  | Int n -> string_of_int n
+  | Bool true -> "true"
+  | Bool false -> "false"
+  | Var x -> x
+  | Binop (op, e1, e2) ->
+    let e1' = compile e1 in
+    let e2' = compile e2 in
+    Printf.sprintf "(%s %s %s)"
+      e1' (match op with | "=" -> "==" | "<>" -> "~=" | _ -> op) e2'
+  | Let (x, e1, e2) ->
+    let e1' = compile e1 in
+    let e2' = compile e2 in
+    Printf.sprintf "(function (%s) return %s end)(%s)" x e2' e1'
+  | Letrec (x, e1, e2) ->
+    let e1' = compile e1 in
+    let e2' = compile e2 in
+    Printf.sprintf "(function (%s_) %s = %s_ return %s end)(%s)" x x x e2' e1'
+  | If (e1, e2, e3) ->
+    let e1' = compile e1 in
+    let e2' = compile e2 in
+    let e3' = compile e3 in
+    Printf.sprintf "(%s and %s or %s)" e1' e2' e3'
+  | Fun (x, e) ->
+    let e' = compile e in
+    Printf.sprintf "function (%s) return %s end" x e'
+  | App (e1, e2) ->
+    let e1' = compile e1 in
+    let e2' = compile e2 in
+    Printf.sprintf "(%s)(%s)" e1' e2'
+
+let read_file name =
+  let file = open_in name in
+  let len = in_channel_length file in
+  let inp = really_input_string file len in
+  close_in file;
+  inp
+
+let parse input =
+  input |> Lexing.from_string |> Parser.prog Lexer.read
+
+let eval input =
+  input |> parse |> interpret []
+
+let lua_of_miniml input =
+  "print(" ^ (input |> parse |> compile) ^ ")"
+
+let print_value value =
+  value |> string_of_value |> print_endline
+
+let repl ?(prompt = "miniml> ") () =
+  let rec loop () =
+    print_string prompt;
+    try
+      read_line () |> eval |> print_value; loop ()
+    with
+    | Lexer.Error e -> Printf.eprintf "Syntax error: %s\n%!" e; loop ()
+    | Parser.Error -> Printf.eprintf "Parser error\n%!"; loop ()
+    | Failure e -> Printf.eprintf "%s\n%!" e; loop ()
+    | End_of_file -> print_endline "Bye"
+  in
+  loop ()
+
+let use_repl = ref false
+
+let parse_args () =
+  let name = Sys.argv.(0) in
+  let usage = Printf.sprintf "Usage: %s [-c | -e | -r]" name in
+  let options = [
+    "-c", Arg.String (fun f -> f |> read_file |> lua_of_miniml |> print_endline), "Compile";
+    "-e", Arg.String (fun f -> f |> read_file |> eval |> print_value), "Evaluate";
+    "-r", Arg.Set use_repl, "REPL"] in
+  (* Ignore anonymous arguments *)
+  Arg.parse options ignore usage
+
+let () =
+  parse_args ();
+  if !use_repl then repl ()
