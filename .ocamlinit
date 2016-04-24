@@ -3,6 +3,9 @@
 #load "parser.cmo"
 #load "ast.cmo"
 #load "miniml.cmo"
+#use "test.ml"
 
 open Ast
 open Miniml
+
+let () = test ()
