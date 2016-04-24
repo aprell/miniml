@@ -1,0 +1,8 @@
+#directory "_build"
+#load "lexer.cmo"
+#load "parser.cmo"
+#load "ast.cmo"
+#load "miniml.cmo"
+
+open Ast
+open Miniml
