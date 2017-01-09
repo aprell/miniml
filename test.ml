@@ -29,7 +29,7 @@ let test_exn a (e : exn) () =
       ~got:(string_of_value c)
       ~expected:(Printexc.to_string e)
   with x ->
-    if x != e then
+    if x <> e then
       fail a
         ~got:(Printexc.to_string x)
         ~expected:(Printexc.to_string e)
