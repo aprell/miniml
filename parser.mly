@@ -18,7 +18,8 @@
 %nonassoc LET
 %nonassoc FUN
 %nonassoc IF
-%left EQ LT GT LE GE
+%left EQ NE
+%left LT GT LE GE
 %left PLUS MINUS
 %left TIMES DIV
 %left APP
