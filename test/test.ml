@@ -1,5 +1,5 @@
-open Ast
-open Miniml
+open Miniml.Ast
+open Miniml.Core
 
 let pass = ref true
 

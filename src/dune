@@ -1,0 +1,14 @@
+(ocamllex
+  (modules lexer))
+
+(menhir
+  (modules parser))
+
+(library
+  (name miniml)
+  (modules lexer parser ast core))
+
+(executable
+  (name main)
+  (modules main)
+  (libraries miniml))

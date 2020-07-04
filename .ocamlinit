@@ -1,9 +1,1 @@
-#directory "_build"
-#load "lexer.cmo"
-#load "parser.cmo"
-#load "ast.cmo"
-#load "miniml.cmo"
-#use "test.ml"
-
-open Ast
-open Miniml
+#use "test/test.ml"
