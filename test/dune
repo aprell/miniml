@@ -1,4 +1,9 @@
 (executable
+  (name expect)
+  (modules expect)
+  (libraries miniml))
+
+(executable
   (name test)
   (modules test)
   (libraries miniml))

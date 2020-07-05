@@ -1,0 +1,23 @@
+Program
+└── Letrec
+    └── fact
+    └── Fun
+        └── x
+        └── If
+            └── Binop
+                └── (<)
+                └── Var: x
+                └── Int: 2
+            └── Int: 1
+            └── Binop
+                └── (*)
+                └── Var: x
+                └── App
+                    └── Var: fact
+                    └── Binop
+                        └── (-)
+                        └── Var: x
+                        └── Int: 1
+    └── App
+        └── Var: fact
+        └── Int: 10

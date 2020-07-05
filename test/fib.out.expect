@@ -1,0 +1,28 @@
+Program
+└── Letrec
+    └── fib
+    └── Fun
+        └── x
+        └── If
+            └── Binop
+                └── (<)
+                └── Var: x
+                └── Int: 2
+            └── Var: x
+            └── Binop
+                └── (+)
+                └── App
+                    └── Var: fib
+                    └── Binop
+                        └── (-)
+                        └── Var: x
+                        └── Int: 1
+                └── App
+                    └── Var: fib
+                    └── Binop
+                        └── (-)
+                        └── Var: x
+                        └── Int: 2
+    └── App
+        └── Var: fib
+        └── Int: 10
