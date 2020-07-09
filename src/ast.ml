@@ -3,11 +3,16 @@ type expr =
   | Bool of bool
   | Var of name
   | Binop of name * expr * expr
-  | Let of name * expr * expr
-  | Letrec of name * expr * expr
+  | Let of (name * ty option) * expr * expr
+  | Letrec of (name * ty) * expr * expr
   | If of expr * expr * expr
-  | Fun of name * expr
+  | Fun of (name * ty) * expr
   | App of expr * expr
+
+and ty =
+  | TInt
+  | TBool
+  | TFun of ty * ty
 
 and name = string
 
@@ -23,6 +28,15 @@ let string_of_value = function
   | VBool true -> "true"
   | VBool false -> "false"
   | VFun _ -> "<fun>"
+
+let rec string_of_type = function
+  | TInt -> "int"
+  | TBool -> "bool"
+  | TFun (t1, t2) ->
+    Printf.sprintf
+      "%s -> %s"
+      (string_of_type t1)
+      (string_of_type t2)
 
 let print ~indent =
   print_string indent;
@@ -42,14 +56,14 @@ let rec pprint_expr ~indent = function
       pprint_expr ~indent e1;
       pprint_expr ~indent e2
     )
-  | Let (x, e1, e2) -> (
+  | Let ((x, _), e1, e2) -> (
       print ~indent "Let\n";
       let indent = "    " ^ indent in
       print ~indent "%s\n" x;
       pprint_expr ~indent e1;
       pprint_expr ~indent e2
     )
-  | Letrec (x, e1, e2) -> (
+  | Letrec ((x, _), e1, e2) -> (
       print ~indent "Letrec\n";
       let indent = "    " ^ indent in
       print ~indent "%s\n" x;
@@ -63,7 +77,7 @@ let rec pprint_expr ~indent = function
       pprint_expr ~indent e2;
       pprint_expr ~indent e3
     )
-  | Fun (x, e) -> (
+  | Fun ((x, _), e) -> (
       print ~indent "Fun\n";
       let indent = "    " ^ indent in
       print ~indent "%s\n" x;

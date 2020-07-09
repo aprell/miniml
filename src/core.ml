@@ -1,4 +1,5 @@
 open Ast
+open Types
 
 let apply = function
   | "+",  VInt a, VInt b -> VInt (a + b)
@@ -23,12 +24,12 @@ let rec interpret env = function
     let e1' = interpret env e1 in
     let e2' = interpret env e2 in
     apply (op, e1', e2')
-  | Let (x, e1, e2) ->
+  | Let ((x, _), e1, e2) ->
     let e1' = interpret env e1 in
     interpret ((x, ref e1') :: env) e2
-  | Letrec (x, e1, e2) ->
+  | Letrec ((x, _), e1, e2) ->
     (* Bind x to dummy value *)
-    let env' = ((x, ref (VBool false)) :: env) in
+    let env' = (x, ref (VBool false)) :: env in
     let e1' = interpret env' e1 in
     (* Backpatch x with function closure *)
     lookup x env' := e1';
@@ -39,7 +40,7 @@ let rec interpret env = function
       | VBool true -> interpret env e2
       | _ -> interpret env e3
     end
-  | Fun (x, e) -> VFun (x, e, env)
+  | Fun ((x, _), e) -> VFun (x, e, env)
   | App (e1, e2) ->
     let e1' = interpret env e1 in
     let e2' = interpret env e2 in
@@ -58,11 +59,11 @@ let rec compile = function
     let e2' = compile e2 in
     Printf.sprintf "(%s %s %s)"
       e1' (match op with | "=" -> "==" | "<>" -> "~=" | _ -> op) e2'
-  | Let (x, e1, e2) ->
+  | Let ((x, _), e1, e2) ->
     let e1' = compile e1 in
     let e2' = compile e2 in
     Printf.sprintf "(function (%s) return %s end)(%s)" x e2' e1'
-  | Letrec (x, e1, e2) ->
+  | Letrec ((x, _), e1, e2) ->
     let e1' = compile e1 in
     let e2' = compile e2 in
     Printf.sprintf "(function (%s_) %s = %s_ return %s end)(%s)" x x x e2' e1'
@@ -71,7 +72,7 @@ let rec compile = function
     let e2' = compile e2 in
     let e3' = compile e3 in
     Printf.sprintf "(%s and %s or %s)" e1' e2' e3'
-  | Fun (x, e) ->
+  | Fun ((x, _), e) ->
     let e' = compile e in
     Printf.sprintf "function (%s) return %s end" x e'
   | App (e1, e2) ->
@@ -83,10 +84,14 @@ let parse input =
   input |> Lexing.from_string |> Parser.prog Lexer.read
 
 let eval input =
-  input |> parse |> interpret []
+  let ast = parse input in
+  let _ = typecheck [] ast in
+  interpret [] ast
 
 let lua_of_miniml input =
-  "print(" ^ (input |> parse |> compile) ^ ")"
+  let ast = parse input in
+  let _ = typecheck [] ast in
+  "print(" ^ compile ast ^ ")"
 
 let print_value value =
   value |> string_of_value |> print_endline

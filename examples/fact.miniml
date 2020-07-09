@@ -1,5 +1,5 @@
-let rec fact =
-  fun x ->
+let rec fact : int -> int =
+  fun x : int =>
     if x < 2 then 1
     else x * fact (x-1)
 in

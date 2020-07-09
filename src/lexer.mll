@@ -40,10 +40,14 @@ rule read = parse
   | "if"        { IF }
   | "then"      { THEN }
   | "else"      { ELSE }
+  | "int"       { TINT }
+  | "bool"      { TBOOL }
   | "true"      { TRUE }
   | "false"     { FALSE }
   | "fun"       { FUN }
   | "->"        { ARROW }
+  | "=>"        { DARROW }
+  | ":"         { COLON }
   | "("         { LPAREN }
   | ")"         { RPAREN }
   | ident as id { VAR id }

@@ -47,7 +47,7 @@ test
 (* Dynamic scope => 7 *)
 (* Lexical scope => 8 *)
 "let x = 5 in
- let f = fun y -> x + y in
+ let f = fun y : int => x + y in
  let x = 4 in
  f 3"
  (VInt 8);
@@ -57,8 +57,8 @@ test
 (* Dynamic scope => 6 *)
 (* Lexical scope => 8 *)
 "let x = 5 in
- let f = fun y -> x + y in
- let g = fun x -> f x in
+ let f = fun y : int => x + y in
+ let g = fun x : int => f x in
  let x = 4 in
  g 3"
  (VInt 8);
@@ -68,8 +68,8 @@ test
 (* Dynamic scope => 7 *)
 (* Lexical scope => 8 *)
 "let x = 5 in
- let f = fun y -> x + y in
- let g = fun y -> f y in
+ let f = fun y : int => x + y in
+ let g = fun y : int => f y in
  let x = 4 in
  g 3"
  (VInt 8);
@@ -77,15 +77,15 @@ test
 test_exn
 (* Dynamic scope => 5 *)
 (* Lexical scope => Error: Unbound value x *)
-"let f = fun y -> x + y in
+"let f = fun y : int => x + y in
  let x = 3 in
  let y = 4 in
  f 2"
  Not_found;
 
 test
-"let rec fact =
-   fun x ->
+"let rec fact : int -> int =
+   fun x : int =>
      if x = 0 then 1
      else x * fact (x-1)
  in

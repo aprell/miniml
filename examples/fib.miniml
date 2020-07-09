@@ -1,5 +1,5 @@
-let rec fib =
-  fun x ->
+let rec fib : int -> int =
+  fun x : int =>
     if x < 2 then x
     else fib (x-1) + fib (x-2)
 in
