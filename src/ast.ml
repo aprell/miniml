@@ -56,17 +56,24 @@ let rec pprint_expr ~indent = function
       pprint_expr ~indent e1;
       pprint_expr ~indent e2
     )
-  | Let ((x, _), e1, e2) -> (
+  | Let ((x, Some ty), e1, e2) -> (
+      print ~indent "Let\n";
+      let indent = "    " ^ indent in
+      print ~indent "%s: %s\n" x (string_of_type ty);
+      pprint_expr ~indent e1;
+      pprint_expr ~indent e2
+    )
+  | Let ((x, None), e1, e2) -> (
       print ~indent "Let\n";
       let indent = "    " ^ indent in
       print ~indent "%s\n" x;
       pprint_expr ~indent e1;
       pprint_expr ~indent e2
     )
-  | Letrec ((x, _), e1, e2) -> (
+  | Letrec ((x, ty), e1, e2) -> (
       print ~indent "Letrec\n";
       let indent = "    " ^ indent in
-      print ~indent "%s\n" x;
+      print ~indent "%s: %s\n" x (string_of_type ty);
       pprint_expr ~indent e1;
       pprint_expr ~indent e2
     )
@@ -77,10 +84,10 @@ let rec pprint_expr ~indent = function
       pprint_expr ~indent e2;
       pprint_expr ~indent e3
     )
-  | Fun ((x, _), e) -> (
+  | Fun ((x, ty), e) -> (
       print ~indent "Fun\n";
       let indent = "    " ^ indent in
-      print ~indent "%s\n" x;
+      print ~indent "%s: %s\n" x (string_of_type ty);
       pprint_expr ~indent e
     )
   | App (e1, e2) -> (

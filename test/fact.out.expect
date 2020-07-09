@@ -1,8 +1,8 @@
 Program
 └── Letrec
-    └── fact
+    └── fact: int -> int
     └── Fun
-        └── x
+        └── x: int
         └── If
             └── Binop
                 └── (<)
