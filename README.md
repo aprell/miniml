@@ -24,8 +24,7 @@ Oh dear.
 TODO
 ----
 
-- Study [TAPL](https://www.cis.upenn.edu/~bcpierce/tapl)
-- Add types, type checking, and type inference
+TODO
 
 References
 ----------
@@ -34,3 +33,4 @@ References
 - [Compilers as lazy denotational interpreters](http://researchblogs.cs.bham.ac.uk/thelablunch/2016/01/compilers-as-lazy-denotational-interpreters)
 - [The Programming Languages Zoo](https://github.com/andrejbauer/plzoo)
 - [Compiling Mini-ML to JavaScript](http://www.lexicallyscoped.com/2015/06/28/miniml-compiler-to-js.html)
+- [An Intro to Type Checking](https://mukulrathi.netlify.app/create-your-own-programming-language/intro-to-type-checking)
