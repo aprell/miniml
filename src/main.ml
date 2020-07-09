@@ -1,4 +1,5 @@
 open Miniml.Core
+open Miniml.Utils
 
 let use_repl = ref false
 

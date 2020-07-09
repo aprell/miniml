@@ -79,13 +79,6 @@ let rec compile = function
     let e2' = compile e2 in
     Printf.sprintf "(%s)(%s)" e1' e2'
 
-let read_file name =
-  let file = open_in name in
-  let len = in_channel_length file in
-  let inp = really_input_string file len in
-  close_in file;
-  inp
-
 let parse input =
   input |> Lexing.from_string |> Parser.prog Lexer.read
 

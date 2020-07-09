@@ -1,5 +1,6 @@
 open Miniml.Ast
 open Miniml.Core
+open Miniml.Utils
 
 let () =
   read_file (
