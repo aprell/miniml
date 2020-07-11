@@ -34,3 +34,4 @@ References
 - [The Programming Languages Zoo](https://github.com/andrejbauer/plzoo)
 - [Compiling Mini-ML to JavaScript](http://www.lexicallyscoped.com/2015/06/28/miniml-compiler-to-js.html)
 - [An Intro to Type Checking](https://mukulrathi.netlify.app/create-your-own-programming-language/intro-to-type-checking)
+- [Parser generators and function application](https://ptival.github.io/2017/05/16/parser-generators-and-function-application)
