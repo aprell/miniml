@@ -26,8 +26,8 @@
 %left LT GT LE GE
 %left PLUS MINUS
 %left TIMES DIV
-%left APP
 %nonassoc VAR INT FALSE TRUE LPAREN
+%nonassoc APP
 
 %start <Ast.expr> prog
 

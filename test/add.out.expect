@@ -1,0 +1,22 @@
+Program
+└── Let
+    └── add
+    └── Fun
+        └── a: int
+        └── Fun
+            └── b: int
+            └── Binop
+                └── (+)
+                └── Var: a
+                └── Var: b
+    └── Let
+        └── a
+        └── Int: 1
+        └── Let
+            └── b
+            └── Int: 2
+            └── App
+                └── App
+                    └── Var: add
+                    └── Var: a
+                └── Var: b
