@@ -14,8 +14,6 @@
 %token FUN
 %token ARROW DARROW
 %token COLON COMMA
-%token TINT
-%token TBOOL
 %token EOF
 
 %nonassoc IN
@@ -65,8 +63,12 @@ type_annot:
   ;
 
 type_name:
-  | TINT  { TInt }
-  | TBOOL { TBool }
+  | VAR
+    { match $1 with
+      | "int" -> TInt
+      | "bool" -> TBool
+      | name -> failwith ("Unknown type name " ^ name)
+    }
   | type_name ARROW type_name { TFun ($1, $3) }
   ;
 
