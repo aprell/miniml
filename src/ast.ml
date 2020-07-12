@@ -23,6 +23,17 @@ type value =
 
 and env = (name * value ref) list
 
+let rec desugar = function
+  | `Fun (params, body) ->
+    begin match params with
+    | (param, ty) :: [] ->
+      Fun ((param, ty), body)
+    | (param, ty) :: params ->
+      Fun ((param, ty), desugar (`Fun (params, body)))
+    | [] -> failwith "Empty parameter list"
+    end
+  | _ -> assert false
+
 let string_of_value = function
   | VInt n -> string_of_int n
   | VBool true -> "true"

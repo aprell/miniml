@@ -48,6 +48,7 @@ rule read = parse
   | "->"        { ARROW }
   | "=>"        { DARROW }
   | ":"         { COLON }
+  | ","         { COMMA }
   | "("         { LPAREN }
   | ")"         { RPAREN }
   | ident as id { VAR id }

@@ -11,8 +11,9 @@
 %token LET REC IN
 %token IF THEN ELSE
 %token TRUE FALSE
-%token FUN DARROW
-%token COLON ARROW
+%token FUN
+%token ARROW DARROW
+%token COLON COMMA
 %token TINT
 %token TBOOL
 %token EOF
@@ -46,9 +47,17 @@ expr:
   | LET VAR option(type_annot) EQ expr IN expr { Let (($2, $3), $5, $7) }
   | LET REC VAR type_annot EQ expr IN expr     { Letrec (($3, $4), $6, $8) }
   | IF expr THEN expr ELSE expr %prec IF       { If ($2, $4, $6) }
-  | FUN VAR type_annot DARROW expr %prec FUN   { Fun (($2, $3), $5) }
+  | FUN param_list DARROW expr %prec FUN       { `Fun ($2, $4) |> desugar }
   | expr expr %prec APP                        { App ($1, $2) }
   | LPAREN expr RPAREN                         { $2 }
+  ;
+
+param_list:
+  | separated_list(COMMA, param) { $1 }
+  ;
+
+param:
+  | VAR type_annot { ($1, $2) }
   ;
 
 type_annot:
