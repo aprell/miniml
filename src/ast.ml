@@ -1,6 +1,7 @@
 type expr =
   | Int of int
   | Bool of bool
+  | Unit
   | Var of name
   | Binop of name * expr * expr
   | Let of (name * ty option) * expr * expr
@@ -12,6 +13,7 @@ type expr =
 and ty =
   | TInt
   | TBool
+  | TUnit
   | TFun of ty * ty
 
 and name = string
@@ -19,6 +21,7 @@ and name = string
 type value =
   | VInt of int
   | VBool of bool
+  | VUnit
   | VFun of name * expr * env
 
 and env = (name * value ref) list
@@ -30,7 +33,7 @@ let rec desugar = function
       Fun ((param, ty), body)
     | (param, ty) :: params ->
       Fun ((param, ty), desugar (`Fun (params, body)))
-    | [] -> failwith "Empty parameter list"
+    | [] -> Fun (("_", TUnit), body)
     end
   | _ -> assert false
 
@@ -38,11 +41,13 @@ let string_of_value = function
   | VInt n -> string_of_int n
   | VBool true -> "true"
   | VBool false -> "false"
+  | VUnit -> "()"
   | VFun _ -> "<fun>"
 
 let rec string_of_type = function
   | TInt -> "int"
   | TBool -> "bool"
+  | TUnit -> "unit"
   | TFun (t1, t2) ->
     Printf.sprintf
       "%s -> %s"
@@ -58,6 +63,8 @@ let rec pprint_expr ~indent = function
     print ~indent "Int: %d\n" i
   | Bool b ->
     print ~indent "Bool: %s\n" (if b then "true" else "false")
+  | Unit ->
+    print ~indent "Unit: ()\n"
   | Var x ->
     print ~indent "Var: %s\n" x
   | Binop (op, e1, e2) -> (

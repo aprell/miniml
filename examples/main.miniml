@@ -1,0 +1,7 @@
+let main =
+  fun =>
+    let a = 1 in
+    let b = 2 in
+    a + b
+in
+main ()

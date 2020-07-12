@@ -19,6 +19,7 @@ let lookup = List.assoc
 let rec typecheck env = function
   | Int _ -> TInt
   | Bool _ -> TBool
+  | Unit -> TUnit
   | Var x -> lookup x env
   | Binop (op, e1, e2) ->
     let ty_e1 = typecheck env e1 in

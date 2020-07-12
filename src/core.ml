@@ -19,6 +19,7 @@ let lookup = List.assoc
 let rec interpret env = function
   | Int n -> VInt n
   | Bool n -> VBool n
+  | Unit -> VUnit
   | Var x -> !(lookup x env)
   | Binop (op, e1, e2) ->
     let e1' = interpret env e1 in
@@ -53,6 +54,7 @@ let rec compile = function
   | Int n -> string_of_int n
   | Bool true -> "true"
   | Bool false -> "false"
+  | Unit -> "nil"
   | Var x -> x
   | Binop (op, e1, e2) ->
     let e1' = compile e1 in

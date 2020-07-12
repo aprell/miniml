@@ -41,6 +41,7 @@ expr:
   | VAR                                        { Var $1 }
   | TRUE                                       { Bool true }
   | FALSE                                      { Bool false }
+  | LPAREN RPAREN                              { Unit }
   | expr binop expr                            { Binop ($2, $1, $3) }
   | LET VAR option(type_annot) EQ expr IN expr { Let (($2, $3), $5, $7) }
   | LET REC VAR type_annot EQ expr IN expr     { Letrec (($3, $4), $6, $8) }
@@ -67,6 +68,7 @@ type_name:
     { match $1 with
       | "int" -> TInt
       | "bool" -> TBool
+      | "unit" -> TUnit
       | name -> failwith ("Unknown type name " ^ name)
     }
   | type_name ARROW type_name { TFun ($1, $3) }
