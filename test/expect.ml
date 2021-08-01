@@ -1,6 +1,12 @@
 open Miniml.Ast
 open Miniml.Core
+open Miniml.Optim
+open Miniml.Types
 open Miniml.Utils
+
+let print ast =
+  let _ = typecheck [] ast in
+  pprint_prog (optimize ast)
 
 let () =
   read_file (
@@ -9,4 +15,4 @@ let () =
     | _ -> failwith "Input file required"
   )
   |> parse
-  |> pprint_prog
+  |> print
