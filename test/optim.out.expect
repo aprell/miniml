@@ -1,0 +1,32 @@
+Program
+└── Let
+    └── a
+    └── Binop
+        └── (+)
+        └── Int: 1
+        └── Int: 2
+    └── Let
+        └── b
+        └── Binop
+            └── (-)
+            └── Binop
+                └── (*)
+                └── Int: 3
+                └── Int: 4
+            └── Int: 5
+        └── Let
+            └── c
+            └── If
+                └── Bool: true
+                └── Binop
+                    └── (+)
+                    └── Var: a
+                    └── Var: b
+                └── Binop
+                    └── (+)
+                    └── Binop
+                        └── (-)
+                        └── Int: 0
+                        └── Var: a
+                    └── Var: b
+            └── Var: c

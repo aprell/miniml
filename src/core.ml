@@ -1,5 +1,6 @@
 open Ast
 open Types
+open Optim
 
 let apply = function
   | "+",  VInt a, VInt b -> VInt (a + b)
@@ -88,12 +89,12 @@ let parse input =
 let eval input =
   let ast = parse input in
   let _ = typecheck [] ast in
-  interpret [] ast
+  interpret [] (optimize ast)
 
 let lua_of_miniml input =
   let ast = parse input in
   let _ = typecheck [] ast in
-  "print(" ^ compile ast ^ ")"
+  "print(" ^ compile (optimize ast) ^ ")"
 
 let print_value value =
   value |> string_of_value |> print_endline

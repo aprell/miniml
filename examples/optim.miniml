@@ -1,0 +1,4 @@
+let a = 1 + 2 in
+let b = 3 * 4 - 5 in
+let c = if true then a + b else (0 - a) + b in
+c
