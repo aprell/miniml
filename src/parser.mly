@@ -60,7 +60,7 @@ param:
   ;
 
 type_annot:
-  | COLON type_name { $2 }
+  | preceded(COLON, type_name) { $1 }
   ;
 
 type_name:
