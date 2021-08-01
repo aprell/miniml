@@ -15,37 +15,40 @@ let map f = function
   | App (e1, e2) ->
     App (f e1, f e2)
 
-let rec constant_fold = function
-  | Binop ("+",  Int a, Int b) -> Int (a + b)
-  | Binop ("-",  Int a, Int b) -> Int (a - b)
-  | Binop ("*",  Int a, Int b) -> Int (a * b)
-  | Binop ("/",  Int a, Int b) -> Int (a / b)
-  | Binop ("=",  Int a, Int b) -> Bool (a = b)
-  | Binop ("<>", Int a, Int b) -> Bool (a <> b)
-  | Binop ("<",  Int a, Int b) -> Bool (a < b)
-  | Binop (">",  Int a, Int b) -> Bool (a > b)
-  | Binop ("<=", Int a, Int b) -> Bool (a <= b)
-  | Binop (">=", Int a, Int b) -> Bool (a >= b)
-  | e -> map constant_fold e
+let constant_fold first_pass next_pass = function
+  | Binop ("+",  Int a, Int b) -> first_pass (Int (a + b))
+  | Binop ("-",  Int a, Int b) -> first_pass (Int (a - b))
+  | Binop ("*",  Int a, Int b) -> first_pass (Int (a * b))
+  | Binop ("/",  Int a, Int b) -> first_pass (Int (a / b))
+  | Binop ("=",  Int a, Int b) -> first_pass (Bool (a = b))
+  | Binop ("<>", Int a, Int b) -> first_pass (Bool (a <> b))
+  | Binop ("<",  Int a, Int b) -> first_pass (Bool (a < b))
+  | Binop (">",  Int a, Int b) -> first_pass (Bool (a > b))
+  | Binop ("<=", Int a, Int b) -> first_pass (Bool (a <= b))
+  | Binop (">=", Int a, Int b) -> first_pass (Bool (a >= b))
+  | e -> next_pass e
 
-let rec eliminate_redundant_let = function
-  | Let ((x, _), e, Var y) when x = y ->
-    eliminate_redundant_let e
-  | e -> map eliminate_redundant_let e
+let eliminate_redundant_let first_pass next_pass = function
+  | Let ((x, _), e, Var y) when x = y -> first_pass e
+  | e -> next_pass e
 
-let rec eliminate_unreachable_code = function
-  | If (Bool true, e1, _) -> eliminate_unreachable_code e1
-  | If (Bool false, _, e2) -> eliminate_unreachable_code e2
-  | e -> map eliminate_unreachable_code e
+let eliminate_unreachable_code first_pass next_pass = function
+  | If (Bool true, e1, _) -> first_pass e1
+  | If (Bool false, _, e2) -> first_pass e2
+  | e -> next_pass e
+
+let rec pass ast =
+  constant_fold pass (
+    eliminate_redundant_let pass (
+      eliminate_unreachable_code pass (
+        (map pass)
+      )
+    )
+  ) ast
 
 let optimize ast =
-  let rec loop ast =
-    let ast' =
-      ast
-      |> constant_fold
-      |> eliminate_redundant_let
-      |> eliminate_unreachable_code
-    in
-    if ast' <> ast then loop ast' else ast'
+  let rec traverse ast =
+    let ast' = pass ast in
+    if ast' <> ast then traverse ast' else ast'
   in
-  loop ast
+  traverse ast
