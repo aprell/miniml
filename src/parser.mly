@@ -4,6 +4,7 @@
 
 %token <int> INT
 %token <string> VAR
+%token UNARY_MINUS
 %token PLUS MINUS
 %token TIMES DIV
 %token LPAREN RPAREN
@@ -25,6 +26,7 @@
 %left LT GT LE GE
 %left PLUS MINUS
 %left TIMES DIV
+%right UNARY_MINUS
 %nonassoc VAR INT FALSE TRUE LPAREN
 %nonassoc APP
 
@@ -42,6 +44,7 @@ expr:
   | TRUE                                       { Bool true }
   | FALSE                                      { Bool false }
   | LPAREN RPAREN                              { Unit }
+  | UNARY_MINUS expr                           { Binop ("-", Int 0, $2) }
   | expr binop expr                            { Binop ($2, $1, $3) }
   | LET VAR option(type_annot) EQ expr IN expr { Let (($2, $3), $5, $7) }
   | LET REC VAR type_annot EQ expr IN expr     { Letrec (($3, $4), $6, $8) }

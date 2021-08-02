@@ -24,6 +24,7 @@ let ident = ('_' | alpha) ('_' | alpha | digit)*
 rule read = parse
   | whitespace  { read lexbuf }
   | newline     { Lexing.new_line lexbuf; read lexbuf }
+  | "~"         { UNARY_MINUS }
   | "+"         { PLUS }
   | "-"         { MINUS }
   | "*"         { TIMES }
