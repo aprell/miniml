@@ -1,11 +1,2 @@
 Program
-└── Let
-    └── a
-    └── Int: 3
-    └── Let
-        └── b
-        └── Int: 7
-        └── Binop
-            └── (+)
-            └── Var: a
-            └── Var: b
+└── Int: 3

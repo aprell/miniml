@@ -15,6 +15,26 @@ let map f = function
   | App (e1, e2) ->
     App (f e1, f e2)
 
+let rec simplify = function
+  (* e + 0 = e | 0 + e = e *)
+  | Binop ("+", e, Int 0)
+  | Binop ("+", Int 0, e) -> simplify e
+  (* e - 0 = e *)
+  | Binop ("-", e, Int 0) -> simplify e
+  (* x - x = 0 *)
+  | Binop ("-", Var x, Var y) when x = y -> Int 0
+  (* e * 0 = 0 | 0 * e = 0 *)
+  | Binop ("*", _, Int 0)
+  | Binop ("*", Int 0, _) -> Int 0
+  (* e * 1 = e | 1 * e = e *)
+  | Binop ("*", e, Int 1)
+  | Binop ("*", Int 1, e) -> simplify e
+  (* e / 1 = e *)
+  | Binop ("/", e, Int 1) -> simplify e
+  (* x / x = 1 *)
+  | Binop ("/", Var x, Var y) when x = y -> Int 1
+  | e -> e
+
 let constant_fold first_pass next_pass = function
   | Binop ("+",  Int a, Int b) -> first_pass (Int (a + b))
   | Binop ("-",  Int a, Int b) -> first_pass (Int (a - b))
@@ -26,7 +46,7 @@ let constant_fold first_pass next_pass = function
   | Binop (">",  Int a, Int b) -> first_pass (Bool (a > b))
   | Binop ("<=", Int a, Int b) -> first_pass (Bool (a <= b))
   | Binop (">=", Int a, Int b) -> first_pass (Bool (a >= b))
-  | e -> next_pass e
+  | e -> next_pass (simplify e)
 
 let eliminate_redundant_let first_pass next_pass = function
   | Let ((x, _), e, Var y) when x = y -> first_pass e
