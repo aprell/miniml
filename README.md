@@ -21,11 +21,6 @@ return ((x < 1) and 1 or (x * (fact)((x - 1)))) end))
 
 Oh dear.
 
-TODO
-----
-
-TODO
-
 References
 ----------
 
