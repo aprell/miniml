@@ -21,8 +21,6 @@ let rec simplify = function
   | Binop ("+", Int 0, e) -> simplify e
   (* e - 0 = e *)
   | Binop ("-", e, Int 0) -> simplify e
-  (* 0 - n = -n *)
-  | Binop ("-", Int 0, Int n) -> Int (-n)
   (* x - x = 0 *)
   | Binop ("-", Var x, Var y) when x = y -> Int 0
   (* e * 0 = 0 | 0 * e = 0 *)
