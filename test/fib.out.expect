@@ -1,28 +1,28 @@
 Program
 └── Letrec
-    └── fib: int -> int
-    └── Fun
-        └── x: int
+    ├── fib: int -> int
+    ├── Fun
+        ├── x: int
         └── If
-            └── Binop
-                └── (<)
-                └── Var: x
+            ├── Binop
+                ├── (<)
+                ├── Var: x
                 └── Int: 2
-            └── Var: x
+            ├── Var: x
             └── Binop
-                └── (+)
-                └── App
-                    └── Var: fib
+                ├── (+)
+                ├── App
+                    ├── Var: fib
                     └── Binop
-                        └── (-)
-                        └── Var: x
+                        ├── (-)
+                        ├── Var: x
                         └── Int: 1
                 └── App
-                    └── Var: fib
+                    ├── Var: fib
                     └── Binop
-                        └── (-)
-                        └── Var: x
+                        ├── (-)
+                        ├── Var: x
                         └── Int: 2
     └── App
-        └── Var: fib
+        ├── Var: fib
         └── Int: 10

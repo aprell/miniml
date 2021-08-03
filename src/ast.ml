@@ -54,65 +54,65 @@ let rec string_of_type = function
       (string_of_type t1)
       (string_of_type t2)
 
-let print ~indent =
+let printf ~indent =
   print_string indent;
-  fun args -> Printf.printf args
+  Printf.printf
+
+let _ = assert (String.length "├──" = String.length "└──")
+
+let (++) str suf =
+  let n = String.length str in
+  let m = String.length suf in
+  "    " ^ String.sub str 0 (n - m) ^ suf
 
 let rec pprint_expr ~indent = function
   | Int i ->
-    print ~indent "Int: %d\n" i
+    printf ~indent "Int: %d\n" i
   | Bool b ->
-    print ~indent "Bool: %s\n" (if b then "true" else "false")
+    printf ~indent "Bool: %s\n" (if b then "true" else "false")
   | Unit ->
-    print ~indent "Unit: ()\n"
+    printf ~indent "Unit: ()\n"
   | Var x ->
-    print ~indent "Var: %s\n" x
+    printf ~indent "Var: %s\n" x
   | Binop (op, e1, e2) -> (
-      print ~indent "Binop\n";
-      let indent = "    " ^ indent in
-      print ~indent "(%s)\n" op;
-      pprint_expr ~indent e1;
-      pprint_expr ~indent e2
+      printf      ~indent "Binop\n";
+      printf      ~indent:(indent ++ "├── ") "(%s)\n" op;
+      pprint_expr ~indent:(indent ++ "├── ") e1;
+      pprint_expr ~indent:(indent ++ "└── ") e2
     )
   | Let ((x, Some ty), e1, e2) -> (
-      print ~indent "Let\n";
-      let indent = "    " ^ indent in
-      print ~indent "%s: %s\n" x (string_of_type ty);
-      pprint_expr ~indent e1;
-      pprint_expr ~indent e2
+      printf      ~indent "Let\n";
+      printf      ~indent:(indent ++ "├── ") "%s: %s\n" x (string_of_type ty);
+      pprint_expr ~indent:(indent ++ "├── ") e1;
+      pprint_expr ~indent:(indent ++ "└── ") e2
     )
   | Let ((x, None), e1, e2) -> (
-      print ~indent "Let\n";
-      let indent = "    " ^ indent in
-      print ~indent "%s\n" x;
-      pprint_expr ~indent e1;
-      pprint_expr ~indent e2
+      printf      ~indent "Let\n";
+      printf      ~indent:(indent ++ "├── ") "%s\n" x;
+      pprint_expr ~indent:(indent ++ "├── ") e1;
+      pprint_expr ~indent:(indent ++ "└── ") e2
     )
   | Letrec ((x, ty), e1, e2) -> (
-      print ~indent "Letrec\n";
-      let indent = "    " ^ indent in
-      print ~indent "%s: %s\n" x (string_of_type ty);
-      pprint_expr ~indent e1;
-      pprint_expr ~indent e2
+      printf      ~indent "Letrec\n";
+      printf      ~indent:(indent ++ "├── ") "%s: %s\n" x (string_of_type ty);
+      pprint_expr ~indent:(indent ++ "├── ") e1;
+      pprint_expr ~indent:(indent ++ "└── ") e2
     )
   | If (e1, e2, e3) -> (
-      print ~indent "If\n";
-      let indent = "    " ^ indent in
-      pprint_expr ~indent e1;
-      pprint_expr ~indent e2;
-      pprint_expr ~indent e3
+      printf      ~indent "If\n";
+      pprint_expr ~indent:(indent ++ "├── ") e1;
+      pprint_expr ~indent:(indent ++ "├── ") e2;
+      pprint_expr ~indent:(indent ++ "└── ") e3
     )
   | Fun ((x, ty), e) -> (
-      print ~indent "Fun\n";
-      let indent = "    " ^ indent in
-      print ~indent "%s: %s\n" x (string_of_type ty);
-      pprint_expr ~indent e
+      printf      ~indent "Fun\n";
+      printf      ~indent:(indent ++ "├── ") "%s: %s\n" x (string_of_type ty);
+      pprint_expr ~indent:(indent ++ "└── ") e
     )
   | App (e1, e2) -> (
-      print ~indent "App\n";
-      let indent = "    " ^ indent in
-      pprint_expr ~indent e1;
-      pprint_expr ~indent e2
+      printf      ~indent "App\n";
+      pprint_expr ~indent:(indent ++ "├── ") e1;
+      pprint_expr ~indent:(indent ++ "└── ") e2
     )
 
 let pprint_prog expr =

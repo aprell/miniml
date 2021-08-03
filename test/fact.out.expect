@@ -1,23 +1,23 @@
 Program
 └── Letrec
-    └── fact: int -> int
-    └── Fun
-        └── x: int
+    ├── fact: int -> int
+    ├── Fun
+        ├── x: int
         └── If
-            └── Binop
-                └── (<)
-                └── Var: x
+            ├── Binop
+                ├── (<)
+                ├── Var: x
                 └── Int: 2
-            └── Int: 1
+            ├── Int: 1
             └── Binop
-                └── (*)
-                └── Var: x
+                ├── (*)
+                ├── Var: x
                 └── App
-                    └── Var: fact
+                    ├── Var: fact
                     └── Binop
-                        └── (-)
-                        └── Var: x
+                        ├── (-)
+                        ├── Var: x
                         └── Int: 1
     └── App
-        └── Var: fact
+        ├── Var: fact
         └── Int: 10
