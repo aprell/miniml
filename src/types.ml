@@ -1,8 +1,8 @@
 open Ast
 
-exception Type_error of string
+exception Error of string
 
-let type_error msg = raise (Type_error msg)
+let type_error msg = raise (Error msg)
 
 let check ty ~expect =
   if ty <> expect then
