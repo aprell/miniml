@@ -15,7 +15,9 @@ let apply = function
   | ">=", VInt a, VInt b -> VBool (a >= b)
   | _ -> failwith "Invalid expression"
 
-let lookup = List.assoc
+let lookup x env =
+  try List.assoc x env with
+    Not_found -> failwith (Printf.sprintf "Value of `%s' not found" x)
 
 let rec interpret env = function
   | Int n -> VInt n

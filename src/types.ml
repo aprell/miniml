@@ -14,7 +14,9 @@ let check ty ~expect =
     type_error msg
   else ()
 
-let lookup = List.assoc
+let lookup x env =
+  try List.assoc x env with
+    Not_found -> type_error (Printf.sprintf "Type of `%s' not found" x)
 
 let rec typecheck env = function
   | Int _ -> TInt
