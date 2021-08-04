@@ -81,7 +81,7 @@ test_exn
  let x = 3 in
  let y = 4 in
  f 2"
- Not_found;
+ (Miniml.Types.Error "Type of `x' not found");
 
 test
 "let rec fact : int -> int =
