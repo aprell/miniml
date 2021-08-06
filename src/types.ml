@@ -14,6 +14,18 @@ let check ty ~expect =
     type_error msg
   else ()
 
+let binops =
+  [ ("+",  TFun (TInt, TFun (TInt, TInt)));
+    ("-",  TFun (TInt, TFun (TInt, TInt)));
+    ("*",  TFun (TInt, TFun (TInt, TInt)));
+    ("/",  TFun (TInt, TFun (TInt, TInt)));
+    ("=",  TFun (TInt, TFun (TInt, TBool)));
+    ("<>", TFun (TInt, TFun (TInt, TBool)));
+    ("<",  TFun (TInt, TFun (TInt, TBool)));
+    (">",  TFun (TInt, TFun (TInt, TBool)));
+    ("<=", TFun (TInt, TFun (TInt, TBool)));
+    (">=", TFun (TInt, TFun (TInt, TBool))); ]
+
 let lookup = List.assoc
 
 let rec typecheck' env = function
@@ -21,16 +33,18 @@ let rec typecheck' env = function
   | Bool _ -> TBool
   | Unit -> TUnit
   | Var x -> lookup x env
-  | Binop (op, e1, e2) ->
-    let ty_e1 = try typecheck' env e1 with Not_found -> TInt in
-    let ty_e2 = try typecheck' env e2 with Not_found -> TInt in
-    check ~expect:TInt ty_e1;
-    check ~expect:TInt ty_e2;
-    begin match op with
-      | "+" | "-" | "*" | "/" -> TInt
-      | "=" | "<>" | "<" | ">" | "<=" | ">=" -> TBool
+  | Binop (op, e1, e2) -> (
+      match lookup op binops with
+      | TFun (ty1, TFun (ty2, ty3)) ->
+        let ty_e1 = try typecheck' env e1 with Not_found -> ty1 in
+        let ty_e2 = try typecheck' env e2 with Not_found -> ty2 in
+        check ~expect:ty1 ty_e1;
+        check ~expect:ty2 ty_e2;
+        ty3
+      | exception Not_found ->
+        type_error (Printf.sprintf "Type of `%s' not found" op)
       | _ -> assert false
-    end
+    )
   | Let ((x, Some ty), e1, e2) ->
     let ty_e1 = typecheck' env e1 in
     check ~expect:ty ty_e1;
@@ -56,9 +70,9 @@ let rec typecheck' env = function
     let ty_e1 = typecheck' env e1 in
     let ty_e2 = typecheck' env e2 in
     match ty_e1 with
-    | TFun (ty_a, ty_b) ->
-      check ~expect:ty_a ty_e2;
-      ty_b
+    | TFun (ty1, ty2) ->
+      check ~expect:ty1 ty_e2;
+      ty2
     | _ ->
       type_error "Expected function"
 
