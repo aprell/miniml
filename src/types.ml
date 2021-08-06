@@ -14,9 +14,7 @@ let check ty ~expect =
     type_error msg
   else ()
 
-let lookup x env =
-  try List.assoc x env with
-    Not_found -> type_error (Printf.sprintf "Type of `%s' not found" x)
+let lookup = List.assoc
 
 let rec typecheck' env = function
   | Int _ -> TInt
@@ -24,8 +22,8 @@ let rec typecheck' env = function
   | Unit -> TUnit
   | Var x -> lookup x env
   | Binop (op, e1, e2) ->
-    let ty_e1 = typecheck' env e1 in
-    let ty_e2 = typecheck' env e2 in
+    let ty_e1 = try typecheck' env e1 with Not_found -> TInt in
+    let ty_e2 = try typecheck' env e2 with Not_found -> TInt in
     check ~expect:TInt ty_e1;
     check ~expect:TInt ty_e2;
     begin match op with
