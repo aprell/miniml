@@ -18,14 +18,14 @@ let lookup x env =
   try List.assoc x env with
     Not_found -> type_error (Printf.sprintf "Type of `%s' not found" x)
 
-let rec typecheck env = function
+let rec typecheck' env = function
   | Int _ -> TInt
   | Bool _ -> TBool
   | Unit -> TUnit
   | Var x -> lookup x env
   | Binop (op, e1, e2) ->
-    let ty_e1 = typecheck env e1 in
-    let ty_e2 = typecheck env e2 in
+    let ty_e1 = typecheck' env e1 in
+    let ty_e2 = typecheck' env e2 in
     check ~expect:TInt ty_e1;
     check ~expect:TInt ty_e2;
     begin match op with
@@ -34,32 +34,34 @@ let rec typecheck env = function
       | _ -> assert false
     end
   | Let ((x, Some ty), e1, e2) ->
-    let ty_e1 = typecheck env e1 in
+    let ty_e1 = typecheck' env e1 in
     check ~expect:ty ty_e1;
-    typecheck ((x, ty) :: env) e2
+    typecheck' ((x, ty) :: env) e2
   | Let ((x, None), e1, e2) ->
-    let ty_e1 = typecheck env e1 in
-    typecheck ((x, ty_e1) :: env) e2
+    let ty_e1 = typecheck' env e1 in
+    typecheck' ((x, ty_e1) :: env) e2
   | Letrec ((x, ty), e1, e2) ->
-    let ty_e1 = typecheck ((x, ty) :: env) e1 in
+    let ty_e1 = typecheck' ((x, ty) :: env) e1 in
     check ~expect:ty ty_e1;
-    typecheck ((x, ty) :: env) e2
+    typecheck' ((x, ty) :: env) e2
   | If (e1, e2, e3) ->
-    let ty_e1 = typecheck env e1 in
-    let ty_e2 = typecheck env e2 in
-    let ty_e3 = typecheck env e3 in
+    let ty_e1 = typecheck' env e1 in
+    let ty_e2 = typecheck' env e2 in
+    let ty_e3 = typecheck' env e3 in
     check ~expect:TBool ty_e1;
     check ~expect:ty_e2 ty_e3;
     ty_e2
   | Fun ((x, ty), e) ->
-    let ty_e = typecheck ((x, ty) :: env) e in
+    let ty_e = typecheck' ((x, ty) :: env) e in
     TFun (ty, ty_e)
   | App (e1, e2) ->
-    let ty_e1 = typecheck env e1 in
-    let ty_e2 = typecheck env e2 in
+    let ty_e1 = typecheck' env e1 in
+    let ty_e2 = typecheck' env e2 in
     match ty_e1 with
     | TFun (ty_a, ty_b) ->
       check ~expect:ty_a ty_e2;
       ty_b
     | _ ->
       type_error "Expected function"
+
+let typecheck = typecheck' []

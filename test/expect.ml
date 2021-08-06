@@ -5,7 +5,7 @@ open Miniml.Types
 open Miniml.Utils
 
 let print ast =
-  let _ = typecheck [] ast in
+  let _ = typecheck ast in
   pprint_prog (optimize ast)
 
 let () =

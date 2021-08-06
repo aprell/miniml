@@ -19,39 +19,41 @@ let lookup x env =
   try List.assoc x env with
     Not_found -> failwith (Printf.sprintf "Value of `%s' not found" x)
 
-let rec interpret env = function
+let rec interpret' env = function
   | Int n -> VInt n
   | Bool n -> VBool n
   | Unit -> VUnit
   | Var x -> !(lookup x env)
   | Binop (op, e1, e2) ->
-    let e1' = interpret env e1 in
-    let e2' = interpret env e2 in
+    let e1' = interpret' env e1 in
+    let e2' = interpret' env e2 in
     apply (op, e1', e2')
   | Let ((x, _), e1, e2) ->
-    let e1' = interpret env e1 in
-    interpret ((x, ref e1') :: env) e2
+    let e1' = interpret' env e1 in
+    interpret' ((x, ref e1') :: env) e2
   | Letrec ((x, _), e1, e2) ->
     (* Bind x to dummy value *)
     let env' = (x, ref (VBool false)) :: env in
-    let e1' = interpret env' e1 in
+    let e1' = interpret' env' e1 in
     (* Backpatch x with function closure *)
     lookup x env' := e1';
-    interpret env' e2
+    interpret' env' e2
   | If (e1, e2, e3) ->
-    let e1' = interpret env e1 in
+    let e1' = interpret' env e1 in
     begin match e1' with
-      | VBool true -> interpret env e2
-      | _ -> interpret env e3
+      | VBool true -> interpret' env e2
+      | _ -> interpret' env e3
     end
   | Fun ((x, _), e) -> VFun (x, e, env)
   | App (e1, e2) ->
-    let e1' = interpret env e1 in
-    let e2' = interpret env e2 in
+    let e1' = interpret' env e1 in
+    let e2' = interpret' env e2 in
     begin match e1' with
-      | VFun (x, e, env) -> interpret ((x, ref e2') :: env) e
+      | VFun (x, e, env) -> interpret' ((x, ref e2') :: env) e
       | _ -> failwith "Not a function"
     end
+
+let interpret = interpret' []
 
 let rec compile = function
   | Int n -> string_of_int n
@@ -90,12 +92,12 @@ let parse input =
 
 let eval input =
   let ast = parse input in
-  let _ = typecheck [] ast in
-  interpret [] (optimize ast)
+  let _ = typecheck ast in
+  interpret (optimize ast)
 
 let lua_of_miniml input =
   let ast = parse input in
-  let _ = typecheck [] ast in
+  let _ = typecheck ast in
   "print(" ^ compile (optimize ast) ^ ")"
 
 let print_value value =
