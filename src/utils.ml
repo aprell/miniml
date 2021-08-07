@@ -4,3 +4,7 @@ let read_file name =
   let inp = really_input_string file len in
   close_in file;
   inp
+
+let printf ?(indent = "") =
+  print_string indent;
+  Printf.printf

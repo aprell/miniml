@@ -1,3 +1,5 @@
+open Utils
+
 type expr =
   | Int of int
   | Bool of bool
@@ -37,13 +39,6 @@ let rec desugar = function
     end
   | _ -> assert false
 
-let string_of_value = function
-  | VInt n -> string_of_int n
-  | VBool true -> "true"
-  | VBool false -> "false"
-  | VUnit -> "()"
-  | VFun _ -> "<fun>"
-
 let rec string_of_type = function
   | TInt -> "int"
   | TBool -> "bool"
@@ -54,11 +49,12 @@ let rec string_of_type = function
       (string_of_type t1)
       (string_of_type t2)
 
-let printf ~indent =
-  print_string indent;
-  Printf.printf
-
-let _ = assert (String.length "├──" = String.length "└──")
+let string_of_value = function
+  | VInt n -> string_of_int n
+  | VBool true -> "true"
+  | VBool false -> "false"
+  | VUnit -> "()"
+  | VFun _ -> "<fun>"
 
 let (++) str suf =
   let n = String.length str in
