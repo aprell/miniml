@@ -13,6 +13,7 @@
     optim
     parser
     repl
+    type
     types
     utils
     value))

@@ -8,34 +8,34 @@ let check ty ~expect =
   if ty <> expect then
     let msg = Printf.sprintf
         "Expected %s, got %s"
-        (string_of_type expect)
-        (string_of_type ty)
+        (Type.string_of_type expect)
+        (Type.string_of_type ty)
     in
     type_error msg
   else ()
 
 let binops =
-  [ ("+",  TFun (TInt, TFun (TInt, TInt)));
-    ("-",  TFun (TInt, TFun (TInt, TInt)));
-    ("*",  TFun (TInt, TFun (TInt, TInt)));
-    ("/",  TFun (TInt, TFun (TInt, TInt)));
-    ("=",  TFun (TInt, TFun (TInt, TBool)));
-    ("<>", TFun (TInt, TFun (TInt, TBool)));
-    ("<",  TFun (TInt, TFun (TInt, TBool)));
-    (">",  TFun (TInt, TFun (TInt, TBool)));
-    ("<=", TFun (TInt, TFun (TInt, TBool)));
-    (">=", TFun (TInt, TFun (TInt, TBool))); ]
+  [ ("+",  Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Int)));
+    ("-",  Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Int)));
+    ("*",  Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Int)));
+    ("/",  Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Int)));
+    ("=",  Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Bool)));
+    ("<>", Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Bool)));
+    ("<",  Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Bool)));
+    (">",  Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Bool)));
+    ("<=", Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Bool)));
+    (">=", Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Bool))); ]
 
 let lookup = List.assoc
 
 let rec typecheck' env = function
-  | Int _ -> TInt
-  | Bool _ -> TBool
-  | Unit -> TUnit
+  | Int _ -> Type.Int
+  | Bool _ -> Type.Bool
+  | Unit -> Type.Unit
   | Var x -> lookup x env
   | Binop (op, e1, e2) -> (
       match lookup op binops with
-      | TFun (ty1, TFun (ty2, ty3)) ->
+      | Type.Fun (ty1, Type.Fun (ty2, ty3)) ->
         let ty_e1 = try typecheck' env e1 with Not_found -> ty1 in
         let ty_e2 = try typecheck' env e2 with Not_found -> ty2 in
         check ~expect:ty1 ty_e1;
@@ -60,17 +60,17 @@ let rec typecheck' env = function
     let ty_e1 = typecheck' env e1 in
     let ty_e2 = typecheck' env e2 in
     let ty_e3 = typecheck' env e3 in
-    check ~expect:TBool ty_e1;
+    check ~expect:Type.Bool ty_e1;
     check ~expect:ty_e2 ty_e3;
     ty_e2
   | Fun ((x, ty), e) ->
     let ty_e = typecheck' ((x, ty) :: env) e in
-    TFun (ty, ty_e)
+    Type.Fun (ty, ty_e)
   | App (e1, e2) ->
     let ty_e1 = typecheck' env e1 in
     let ty_e2 = typecheck' env e2 in
     match ty_e1 with
-    | TFun (ty1, ty2) ->
+    | Type.Fun (ty1, ty2) ->
       check ~expect:ty1 ty_e2;
       ty2
     | _ ->

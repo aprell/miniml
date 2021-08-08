@@ -69,12 +69,12 @@ type_annot:
 type_name:
   | VAR
     { match $1 with
-      | "int" -> TInt
-      | "bool" -> TBool
-      | "unit" -> TUnit
+      | "int" -> Type.Int
+      | "bool" -> Type.Bool
+      | "unit" -> Type.Unit
       | name -> failwith ("Unknown type name " ^ name)
     }
-  | type_name ARROW type_name { TFun ($1, $3) }
+  | type_name ARROW type_name { Type.Fun ($1, $3) }
   ;
 
 %inline binop:
