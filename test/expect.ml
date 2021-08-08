@@ -1,7 +1,7 @@
 open Miniml.Ast
 open Miniml.Core
 open Miniml.Optim
-open Miniml.Types
+open Miniml.Typecheck
 open Miniml.Utils
 
 let print ast =

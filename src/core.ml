@@ -1,5 +1,5 @@
 open Ast
-open Types
+open Typecheck
 open Optim
 
 let apply = function

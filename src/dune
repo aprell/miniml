@@ -14,7 +14,7 @@
     parser
     repl
     type
-    types
+    typecheck
     utils
     value))
 
