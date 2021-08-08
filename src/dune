@@ -6,7 +6,7 @@
 
 (library
   (name miniml)
-  (modules lexer parser ast types core optim utils))
+  (modules lexer parser ast types core optim repl utils))
 
 (executable
   (name main)

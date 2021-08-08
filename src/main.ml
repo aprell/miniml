@@ -1,20 +1,21 @@
 open Miniml.Core
+open Miniml.Repl
 open Miniml.Utils
 
 let use_repl = ref true
 
-let eval filename =
-  filename |> read_file |> eval |> print_value
-
 let compile filename =
-  filename |> read_file |> lua_of_miniml |> print_endline
+  filename |> read_file |> compile |> print_endline
+
+let interpret filename =
+  filename |> read_file |> interpret |> print_value
 
 let parse_args () =
   let name = Sys.argv.(0) in
   let usage = Printf.sprintf "Usage: %s [-c | -e]" name in
   let options = [
     "-c", Arg.(Tuple [Clear use_repl; String compile]), "Compile";
-    "-e", Arg.(Tuple [Clear use_repl; String eval]), "Evaluate"]
+    "-e", Arg.(Tuple [Clear use_repl; String interpret]), "Evaluate"]
   in
   (* Ignore anonymous arguments *)
   Arg.parse options ignore usage
