@@ -1,5 +1,5 @@
-open Miniml.Ast
 open Miniml.Core
+open Miniml.Value
 
 let pass = ref true
 
@@ -41,7 +41,7 @@ test
  let y = x + 1 in
  let z = x + y + 1 in
  x + (if z - y <= 3 then y * z else z) + 1"
- (VInt 10);
+ (Int 10);
 
 test
 (* Dynamic scope => 7 *)
@@ -50,7 +50,7 @@ test
  let f = fun y : int => x + y in
  let x = 4 in
  f 3"
- (VInt 8);
+ (Int 8);
 
 test
 (* Names of local variables matter! *)
@@ -61,7 +61,7 @@ test
  let g = fun x : int => f x in
  let x = 4 in
  g 3"
- (VInt 8);
+ (Int 8);
 
 test
 (* Names of local variables matter! *)
@@ -72,7 +72,7 @@ test
  let g = fun y : int => f y in
  let x = 4 in
  g 3"
- (VInt 8);
+ (Int 8);
 
 test_exn
 (* Dynamic scope => 5 *)
@@ -90,7 +90,7 @@ test
      else x * fact (x-1)
  in
  fact 5"
- (VInt 120);
+ (Int 120);
 
 ]
 

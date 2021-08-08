@@ -4,7 +4,7 @@ let repl ?(prompt = "miniml> ") () =
   let rec loop () =
     print_string prompt;
     try
-      read_line () |> interpret |> print_value; loop ()
+      read_line () |> interpret |> Value.print; loop ()
     with
     | Lexer.Error e -> Printf.eprintf "Syntax error: %s\n%!" e; loop ()
     | Parser.Error -> Printf.eprintf "Parser error\n%!"; loop ()

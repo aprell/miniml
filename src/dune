@@ -6,7 +6,16 @@
 
 (library
   (name miniml)
-  (modules lexer parser ast types core optim repl utils))
+  (modules
+    ast
+    core
+    lexer
+    optim
+    parser
+    repl
+    types
+    utils
+    value))
 
 (executable
   (name main)

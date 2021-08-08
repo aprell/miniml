@@ -20,14 +20,6 @@ and ty =
 
 and name = string
 
-type value =
-  | VInt of int
-  | VBool of bool
-  | VUnit
-  | VFun of name * expr * env
-
-and env = (name * value ref) list
-
 let rec desugar = function
   | `Fun (params, body) ->
     begin match params with
@@ -48,13 +40,6 @@ let rec string_of_type = function
       "%s -> %s"
       (string_of_type t1)
       (string_of_type t2)
-
-let string_of_value = function
-  | VInt n -> string_of_int n
-  | VBool true -> "true"
-  | VBool false -> "false"
-  | VUnit -> "()"
-  | VFun _ -> "<fun>"
 
 let (++) str suf =
   let n = String.length str in

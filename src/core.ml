@@ -3,16 +3,16 @@ open Types
 open Optim
 
 let apply = function
-  | "+",  VInt a, VInt b -> VInt (a + b)
-  | "-",  VInt a, VInt b -> VInt (a - b)
-  | "*",  VInt a, VInt b -> VInt (a * b)
-  | "/",  VInt a, VInt b -> VInt (a / b)
-  | "=",  VInt a, VInt b -> VBool (a = b)
-  | "<>", VInt a, VInt b -> VBool (a <> b)
-  | "<",  VInt a, VInt b -> VBool (a < b)
-  | ">",  VInt a, VInt b -> VBool (a > b)
-  | "<=", VInt a, VInt b -> VBool (a <= b)
-  | ">=", VInt a, VInt b -> VBool (a >= b)
+  | "+",  Value.Int a, Value.Int b -> Value.Int (a + b)
+  | "-",  Value.Int a, Value.Int b -> Value.Int (a - b)
+  | "*",  Value.Int a, Value.Int b -> Value.Int (a * b)
+  | "/",  Value.Int a, Value.Int b -> Value.Int (a / b)
+  | "=",  Value.Int a, Value.Int b -> Value.Bool (a = b)
+  | "<>", Value.Int a, Value.Int b -> Value.Bool (a <> b)
+  | "<",  Value.Int a, Value.Int b -> Value.Bool (a < b)
+  | ">",  Value.Int a, Value.Int b -> Value.Bool (a > b)
+  | "<=", Value.Int a, Value.Int b -> Value.Bool (a <= b)
+  | ">=", Value.Int a, Value.Int b -> Value.Bool (a >= b)
   | _ -> failwith "Invalid expression"
 
 let lookup x env =
@@ -20,9 +20,9 @@ let lookup x env =
     Not_found -> failwith (Printf.sprintf "Value of `%s' not found" x)
 
 let rec eval' env = function
-  | Int n -> VInt n
-  | Bool n -> VBool n
-  | Unit -> VUnit
+  | Int n -> Value.Int n
+  | Bool n -> Value.Bool n
+  | Unit -> Value.Unit
   | Var x -> !(lookup x env)
   | Binop (op, e1, e2) ->
     let e1' = eval' env e1 in
@@ -33,7 +33,7 @@ let rec eval' env = function
     eval' ((x, ref e1') :: env) e2
   | Letrec ((x, _), e1, e2) ->
     (* Bind x to dummy value *)
-    let env' = (x, ref (VBool false)) :: env in
+    let env' = (x, ref (Value.Bool false)) :: env in
     let e1' = eval' env' e1 in
     (* Backpatch x with function closure *)
     lookup x env' := e1';
@@ -41,15 +41,15 @@ let rec eval' env = function
   | If (e1, e2, e3) ->
     let e1' = eval' env e1 in
     begin match e1' with
-      | VBool true -> eval' env e2
+      | Value.Bool true -> eval' env e2
       | _ -> eval' env e3
     end
-  | Fun ((x, _), e) -> VFun (x, e, env)
+  | Fun ((x, _), e) -> Value.Fun (x, e, env)
   | App (e1, e2) ->
     let e1' = eval' env e1 in
     let e2' = eval' env e2 in
     begin match e1' with
-      | VFun (x, e, env) -> eval' ((x, ref e2') :: env) e
+      | Value.Fun (x, e, env) -> eval' ((x, ref e2') :: env) e
       | _ -> failwith "Not a function"
     end
 
@@ -99,6 +99,3 @@ let compile input =
   let ast = parse input in
   let _ = typecheck ast in
   "print(" ^ emit (optimize ast) ^ ")"
-
-let print_value value =
-  value |> string_of_value |> print_endline
