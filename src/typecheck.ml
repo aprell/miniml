@@ -14,18 +14,6 @@ let check ty ~expect =
     type_error msg
   else ()
 
-let binops =
-  [ ("+",  Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Int)));
-    ("-",  Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Int)));
-    ("*",  Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Int)));
-    ("/",  Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Int)));
-    ("=",  Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Bool)));
-    ("<>", Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Bool)));
-    ("<",  Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Bool)));
-    (">",  Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Bool)));
-    ("<=", Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Bool)));
-    (">=", Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Bool))); ]
-
 let lookup = List.assoc
 
 let rec typecheck' env = function
@@ -34,7 +22,7 @@ let rec typecheck' env = function
   | Unit -> Type.Unit
   | Var x -> lookup x env
   | Binop (op, e1, e2) -> (
-      match lookup op binops with
+      match lookup op env with
       | Type.Fun (ty1, Type.Fun (ty2, ty3)) ->
         let ty_e1 = try typecheck' env e1 with Not_found -> ty1 in
         let ty_e2 = try typecheck' env e2 with Not_found -> ty2 in
@@ -76,4 +64,15 @@ let rec typecheck' env = function
     | _ ->
       type_error "Expected function"
 
-let typecheck = typecheck' []
+let typecheck = typecheck' [
+  ("+",  Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Int)));
+  ("-",  Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Int)));
+  ("*",  Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Int)));
+  ("/",  Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Int)));
+  ("=",  Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Bool)));
+  ("<>", Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Bool)));
+  ("<",  Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Bool)));
+  (">",  Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Bool)));
+  ("<=", Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Bool)));
+  (">=", Type.Fun (Type.Int, Type.Fun (Type.Int, Type.Bool)));
+]
