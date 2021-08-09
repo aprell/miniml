@@ -9,8 +9,7 @@
 
   let lexing_error lexbuf =
     let input = Lexing.lexeme lexbuf in
-    let line, col = position lexbuf in
-    let msg = Printf.sprintf "%d:%d: unexpected '%s'" line col input in
+    let msg = Printf.sprintf "Unexpected `%s'" input in
     raise (Error msg)
 }
 

@@ -7,7 +7,7 @@ let type_error msg = raise (Error msg)
 let check ty ~expect =
   if ty <> expect then
     let msg = Printf.sprintf
-        "Expected %s, got %s"
+        "Expected `%s', but computed `%s'"
         (Type.string_of_type expect)
         (Type.string_of_type ty)
     in

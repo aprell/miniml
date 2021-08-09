@@ -88,12 +88,30 @@ let rec emit = function
     Printf.sprintf "(%s)(%s)" e1' e2'
 
 let parse input =
-  input |> Lexing.from_string |> Parser.prog Lexer.read
+  let lexbuf = Lexing.from_string input in
+  try Parser.prog Lexer.read lexbuf with
+  | Lexer.Error msg as e ->
+    let line, col = Lexer.position lexbuf in
+    Printf.eprintf "Syntax error in line %d, column %d: %s\n%!" line col msg;
+    raise e
+  | Parser.Error as e ->
+    let line, col = Lexer.position lexbuf in
+    Printf.eprintf "Parse error in line %d, column %d\n%!" line col;
+    raise e
+
+let typecheck ast =
+  try typecheck ast with
+    Typecheck.Error msg as e ->
+    Printf.eprintf "Type error: %s\n%!" msg;
+    raise e
 
 let interpret input =
   let ast = parse input in
   let _ = typecheck ast in
-  eval (optimize ast)
+  try eval (optimize ast) with
+    Failure msg as e ->
+    Printf.eprintf "Runtime error: %s\n%!" msg;
+    raise e
 
 let compile input =
   let ast = parse input in
