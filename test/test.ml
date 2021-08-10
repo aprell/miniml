@@ -12,7 +12,7 @@ let fail test ~got ~expected =
   pass := false
 
 let test a b () =
-  try let c = interpret a in
+  try let c, _ = interpret a in
     try assert (c = b)
     with Assert_failure _ ->
       fail a
@@ -24,7 +24,7 @@ let test a b () =
       ~expected:(string_of_value b)
 
 let test_exn a (e : exn) () =
-  try let c = interpret a in
+  try let c, _ = interpret a in
     fail a
       ~got:(string_of_value c)
       ~expected:(Printexc.to_string e)

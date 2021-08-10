@@ -53,8 +53,6 @@ let rec eval' env = function
       | _ -> failwith "Not a function"
     end
 
-let eval = eval' []
-
 let rec emit = function
   | Int n -> string_of_int n
   | Bool true -> "true"
@@ -105,13 +103,16 @@ let typecheck ast =
     Printf.eprintf "Type error: %s\n%!" msg;
     raise e
 
-let interpret input =
-  let ast = parse input in
-  let _ = typecheck ast in
-  try eval (optimize ast) with
+let eval ast =
+  try eval' [] ast with
     Failure msg as e ->
     Printf.eprintf "Runtime error: %s\n%!" msg;
     raise e
+
+let interpret input =
+  let ast = parse input in
+  let ty = typecheck ast in
+  eval (optimize ast), ty
 
 let compile input =
   let ast = parse input in
