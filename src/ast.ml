@@ -25,12 +25,7 @@ let rec desugar = function
     end
   | _ -> assert false
 
-let (++) str suf =
-  let n = String.length str in
-  let m = String.length suf in
-  "    " ^ String.sub str 0 (n - m) ^ suf
-
-let rec pprint_expr ~indent = function
+let rec pprint_expr ~indent ~prefix = function
   | Int i ->
     printf ~indent "Int: %d\n" i
   | Bool b ->
@@ -41,45 +36,45 @@ let rec pprint_expr ~indent = function
     printf ~indent "Var: %s\n" x
   | Binop (op, e1, e2) -> (
       printf      ~indent "Binop\n";
-      printf      ~indent:(indent ++ "├── ") "(%s)\n" op;
-      pprint_expr ~indent:(indent ++ "├── ") e1;
-      pprint_expr ~indent:(indent ++ "└── ") e2
+      printf      ~indent:(prefix ^ "├── ") "(%s)\n" op;
+      pprint_expr ~indent:(prefix ^ "├── ") ~prefix:(prefix ^ "│   ") e1;
+      pprint_expr ~indent:(prefix ^ "└── ") ~prefix:(prefix ^ "    ") e2
     )
   | Let ((x, Some ty), e1, e2) -> (
       printf      ~indent "Let\n";
-      printf      ~indent:(indent ++ "├── ") "%s: %s\n" x (Type.string_of_type ty);
-      pprint_expr ~indent:(indent ++ "├── ") e1;
-      pprint_expr ~indent:(indent ++ "└── ") e2
+      printf      ~indent:(prefix ^ "├── ") "%s: %s\n" x (Type.string_of_type ty);
+      pprint_expr ~indent:(prefix ^ "├── ") ~prefix:(prefix ^ "│   ") e1;
+      pprint_expr ~indent:(prefix ^ "└── ") ~prefix:(prefix ^ "    ") e2
     )
   | Let ((x, None), e1, e2) -> (
       printf      ~indent "Let\n";
-      printf      ~indent:(indent ++ "├── ") "%s\n" x;
-      pprint_expr ~indent:(indent ++ "├── ") e1;
-      pprint_expr ~indent:(indent ++ "└── ") e2
+      printf      ~indent:(prefix ^ "├── ") "%s\n" x;
+      pprint_expr ~indent:(prefix ^ "├── ") ~prefix:(prefix ^ "│   ") e1;
+      pprint_expr ~indent:(prefix ^ "└── ") ~prefix:(prefix ^ "    ") e2
     )
   | Letrec ((x, ty), e1, e2) -> (
       printf      ~indent "Letrec\n";
-      printf      ~indent:(indent ++ "├── ") "%s: %s\n" x (Type.string_of_type ty);
-      pprint_expr ~indent:(indent ++ "├── ") e1;
-      pprint_expr ~indent:(indent ++ "└── ") e2
+      printf      ~indent:(prefix ^ "├── ") "%s: %s\n" x (Type.string_of_type ty);
+      pprint_expr ~indent:(prefix ^ "├── ") ~prefix:(prefix ^ "│   ") e1;
+      pprint_expr ~indent:(prefix ^ "└── ") ~prefix:(prefix ^ "    ") e2
     )
   | If (e1, e2, e3) -> (
       printf      ~indent "If\n";
-      pprint_expr ~indent:(indent ++ "├── ") e1;
-      pprint_expr ~indent:(indent ++ "├── ") e2;
-      pprint_expr ~indent:(indent ++ "└── ") e3
+      pprint_expr ~indent:(prefix ^ "├── ") ~prefix:(prefix ^ "│   ") e1;
+      pprint_expr ~indent:(prefix ^ "├── ") ~prefix:(prefix ^ "│   ") e2;
+      pprint_expr ~indent:(prefix ^ "└── ") ~prefix:(prefix ^ "    ") e3
     )
   | Fun ((x, ty), e) -> (
       printf      ~indent "Fun\n";
-      printf      ~indent:(indent ++ "├── ") "%s: %s\n" x (Type.string_of_type ty);
-      pprint_expr ~indent:(indent ++ "└── ") e
+      printf      ~indent:(prefix ^ "├── ") "%s: %s\n" x (Type.string_of_type ty);
+      pprint_expr ~indent:(prefix ^ "└── ") ~prefix:(prefix ^ "    ") e
     )
   | App (e1, e2) -> (
       printf      ~indent "App\n";
-      pprint_expr ~indent:(indent ++ "├── ") e1;
-      pprint_expr ~indent:(indent ++ "└── ") e2
+      pprint_expr ~indent:(prefix ^ "├── ") ~prefix:(prefix ^ "│   ") e1;
+      pprint_expr ~indent:(prefix ^ "└── ") ~prefix:(prefix ^ "    ") e2
     )
 
 let pprint_prog expr =
   print_endline "Program";
-  pprint_expr ~indent:"└── " expr
+  pprint_expr ~indent:"└── " expr ~prefix:"    "

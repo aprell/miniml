@@ -2,17 +2,17 @@ Program
 └── Let
     ├── main
     ├── Fun
-        ├── _: unit
-        └── Let
-            ├── a
-            ├── Int: 1
-            └── Let
-                ├── b
-                ├── Int: 2
-                └── Binop
-                    ├── (+)
-                    ├── Var: a
-                    └── Var: b
+    │   ├── _: unit
+    │   └── Let
+    │       ├── a
+    │       ├── Int: 1
+    │       └── Let
+    │           ├── b
+    │           ├── Int: 2
+    │           └── Binop
+    │               ├── (+)
+    │               ├── Var: a
+    │               └── Var: b
     └── App
         ├── Var: main
         └── Unit: ()
