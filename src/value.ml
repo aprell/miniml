@@ -14,6 +14,3 @@ let string_of_value = function
   | Bool false -> "false"
   | Unit -> "()"
   | Fun _ -> "<fun>"
-
-let print value =
-  value |> string_of_value |> print_endline

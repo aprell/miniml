@@ -8,7 +8,8 @@ let compile filename =
   filename |> read_file |> compile |> print_endline
 
 let interpret filename =
-  filename |> read_file |> interpret |> fst |> Miniml.Value.print
+  let open Miniml.Value in
+  filename |> read_file |> interpret |> fst |> string_of_value |> print_endline
 
 let parse_args () =
   let name = Sys.argv.(0) in
