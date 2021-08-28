@@ -25,7 +25,7 @@ let rec desugar = function
     end
   | _ -> assert false
 
-let rec pprint_expr ~indent ~prefix = function
+let rec pprint_expr ?(prefix = "    ") ~indent = function
   | Int i ->
     printf ~indent "Int: %d\n" i
   | Bool b ->
@@ -77,4 +77,4 @@ let rec pprint_expr ~indent ~prefix = function
 
 let pprint_prog expr =
   print_endline "Program";
-  pprint_expr ~indent:"└── " expr ~prefix:"    "
+  pprint_expr ~indent:"└── " expr
