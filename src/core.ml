@@ -85,16 +85,31 @@ let rec emit = function
     let e2' = emit e2 in
     Printf.sprintf "(%s)(%s)" e1' e2'
 
+let print_error input Lexing.{ lex_curr_pos = pos; _ } =
+  let sol = (* start of line *)
+    try String.rindex_from input (pos - 1) '\n' + 1 with
+      Not_found -> 0
+  in
+  let eol = (* end of line *)
+    try String.index_from input pos '\n' with
+      Not_found -> String.length input
+  in
+  Printf.eprintf "%s\n%s\n%!"
+    (String.sub input sol (eol - sol))
+    (String.make (pos - sol - 1) ' ' ^ "^")
+
 let parse input =
   let lexbuf = Lexing.from_string input in
   try Parser.prog Lexer.read lexbuf with
   | Lexer.Error msg as e ->
     let line, col = Lexer.position lexbuf in
-    Printf.eprintf "Syntax error in line %d, column %d: %s\n%!" line col msg;
+    Printf.eprintf "Syntax error in line %d, column %d: %s:\n%!" line col msg;
+    print_error input lexbuf;
     raise e
   | Parser.Error as e ->
     let line, col = Lexer.position lexbuf in
-    Printf.eprintf "Parse error in line %d, column %d\n%!" line col;
+    Printf.eprintf "Parse error in line %d, column %d:\n%!" line col;
+    print_error input lexbuf;
     raise e
 
 let typecheck ast =
