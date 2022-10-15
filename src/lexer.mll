@@ -14,6 +14,7 @@
 }
 
 let whitespace = [' ' '\t']+
+let comment = '#' [^ '\n']*
 let newline = '\n'
 let alpha = ['A'-'Z' 'a'-'z']
 let digit = ['0'-'9']
@@ -21,7 +22,8 @@ let int = digit+
 let ident = ('_' | alpha) ('_' | alpha | digit)*
 
 rule read = parse
-  | whitespace  { read lexbuf }
+  | whitespace
+  | comment     { read lexbuf }
   | newline     { Lexing.new_line lexbuf; read lexbuf }
   | "~"         { UNARY_MINUS }
   | "+"         { PLUS }

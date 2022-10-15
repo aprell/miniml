@@ -46,7 +46,7 @@ expr:
   | LPAREN RPAREN                              { Unit }
   | UNARY_MINUS expr                           { Binop ("-", Int 0, $2) }
   | expr binop expr                            { Binop ($2, $1, $3) }
-  | LET VAR option(type_annot) EQ expr IN expr { Let (($2, $3), $5, $7) }
+  | LET VAR type_annot? EQ expr IN expr        { Let (($2, $3), $5, $7) }
   | LET REC VAR type_annot EQ expr IN expr     { Letrec (($3, $4), $6, $8) }
   | IF expr THEN expr ELSE expr %prec IF       { If ($2, $4, $6) }
   | FUN param_list DARROW expr %prec FUN       { `Fun ($2, $4) |> desugar }
