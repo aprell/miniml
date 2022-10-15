@@ -4,3 +4,5 @@ let rec fact : int -> int =
     else x * fact (x-1)
 in
 fact 10
+
+# CHECK: 3628800

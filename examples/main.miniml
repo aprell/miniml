@@ -5,3 +5,5 @@ let main =
     a + b
 in
 main ()
+
+# CHECK: 3

@@ -4,3 +4,5 @@ let rec fib : int -> int =
     else fib (x-1) + fib (x-2)
 in
 fib 10
+
+# CHECK: 55

@@ -1,4 +1,5 @@
 let a = 1 + 2 in
 let b = a * 1 in
-let c = if 1 > 2 then a + b else (b - 0) / 1 in
-c
+let c = if 1 > 2 then a + b else (b - 0) / 1 in c
+
+# CHECK: 3

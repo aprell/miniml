@@ -5,3 +5,5 @@ in
 let a = 1 in
 let b = 2 in
 add a b
+
+# CHECK: 3
