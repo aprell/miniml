@@ -1,18 +1,12 @@
-LIBS := src/miniml
+all: test
 
-PROGS := src/main test/expect test/test
-
-all: $(LIBS) $(PROGS) test
-
-$(LIBS):
-	dune build $(addsuffix .a,$@)
-
-$(PROGS):
-	dune build $(addsuffix .exe,$@)
-
-test: test/expect
+test: test/test.exe test/expect.exe
+	@dune exec test/test.exe 2> /dev/null
 	@echo "Running expect tests"
 	@test/expect.sh
+
+%.exe: %.ml
+	dune build $@
 
 clean:
 	dune clean
