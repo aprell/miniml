@@ -9,9 +9,10 @@ Program
     │       └── Let
     │           ├── b
     │           ├── Int: 2
-    │           └── Binop
-    │               ├── (+)
-    │               ├── Var: a
+    │           └── App
+    │               ├── App
+    │               │   ├── Var: +
+    │               │   └── Var: a
     │               └── Var: b
     └── App
         ├── Var: main

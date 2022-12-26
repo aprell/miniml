@@ -14,31 +14,18 @@ let check ty ~expect =
     type_error msg
   else ()
 
-let lookup = List.assoc
+let lookup x env =
+  try List.assoc x env with
+    Not_found -> type_error (Printf.sprintf "Type of `%s' not found" x)
 
 let rec typecheck' env = function
   | Int _ -> Type.Int
   | Bool _ -> Type.Bool
   | Unit -> Type.Unit
   | Var x -> lookup x env
-  | Binop (op, e1, e2) -> (
-      match lookup op env with
-      | Type.Fun (ty1, Type.Fun (ty2, ty3)) ->
-        let ty_e1 = try typecheck' env e1 with Not_found -> ty1 in
-        let ty_e2 = try typecheck' env e2 with Not_found -> ty2 in
-        check ~expect:ty1 ty_e1;
-        check ~expect:ty2 ty_e2;
-        ty3
-      | exception Not_found ->
-        type_error (Printf.sprintf "Type of `%s' not found" op)
-      | _ -> assert false
-    )
-  | Let ((x, Some ty), e1, e2) ->
+  | Let ((x, ty), e1, e2) ->
     let ty_e1 = typecheck' env e1 in
-    check ~expect:ty ty_e1;
-    typecheck' ((x, ty) :: env) e2
-  | Let ((x, None), e1, e2) ->
-    let ty_e1 = typecheck' env e1 in
+    Option.iter (fun ty -> check ~expect:ty ty_e1) ty;
     typecheck' ((x, ty_e1) :: env) e2
   | Letrec ((x, ty), e1, e2) ->
     let ty_e1 = typecheck' ((x, ty) :: env) e1 in
@@ -56,9 +43,9 @@ let rec typecheck' env = function
     Type.Fun (ty, ty_e)
   | App (e1, e2) ->
     let ty_e1 = typecheck' env e1 in
-    let ty_e2 = typecheck' env e2 in
     match ty_e1 with
     | Type.Fun (ty1, ty2) ->
+      let ty_e2 = try typecheck' env e2 with Error _ -> ty1 in
       check ~expect:ty1 ty_e2;
       ty2
     | _ ->

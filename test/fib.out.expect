@@ -4,24 +4,28 @@ Program
     ├── Fun
     │   ├── x: int
     │   └── If
-    │       ├── Binop
-    │       │   ├── (<)
-    │       │   ├── Var: x
+    │       ├── App
+    │       │   ├── App
+    │       │   │   ├── Var: <
+    │       │   │   └── Var: x
     │       │   └── Int: 2
     │       ├── Var: x
-    │       └── Binop
-    │           ├── (+)
+    │       └── App
     │           ├── App
-    │           │   ├── Var: fib
-    │           │   └── Binop
-    │           │       ├── (-)
-    │           │       ├── Var: x
-    │           │       └── Int: 1
+    │           │   ├── Var: +
+    │           │   └── App
+    │           │       ├── Var: fib
+    │           │       └── App
+    │           │           ├── App
+    │           │           │   ├── Var: -
+    │           │           │   └── Var: x
+    │           │           └── Int: 1
     │           └── App
     │               ├── Var: fib
-    │               └── Binop
-    │                   ├── (-)
-    │                   ├── Var: x
+    │               └── App
+    │                   ├── App
+    │                   │   ├── Var: -
+    │                   │   └── Var: x
     │                   └── Int: 2
     └── App
         ├── Var: fib

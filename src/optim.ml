@@ -2,8 +2,6 @@ open Ast
 
 let map f = function
   | Int _ | Bool _ | Unit | Var _ as e -> e
-  | Binop (op, e1, e2) ->
-    Binop (op, f e1, f e2)
   | Let (name_and_ty, e1, e2)  ->
     Let (name_and_ty, f e1, f e2)
   | Letrec (name_and_ty, e1, e2)  ->
@@ -17,35 +15,35 @@ let map f = function
 
 let rec simplify = function
   (* e + 0 = e | 0 + e = e *)
-  | Binop ("+", e, Int 0)
-  | Binop ("+", Int 0, e) -> simplify e
+  | App (App (Var "+", e), Int 0)
+  | App (App (Var "+", Int 0), e) -> simplify e
   (* e - 0 = e *)
-  | Binop ("-", e, Int 0) -> simplify e
+  | App (App (Var "-", e), Int 0) -> simplify e
   (* x - x = 0 *)
-  | Binop ("-", Var x, Var y) when x = y -> Int 0
+  | App (App (Var "-", Var x), Var y) when x = y -> Int 0
   (* e * 0 = 0 | 0 * e = 0 *)
-  | Binop ("*", _, Int 0)
-  | Binop ("*", Int 0, _) -> Int 0
+  | App (App (Var "*", _), Int 0)
+  | App (App (Var "*", Int 0), _) -> Int 0
   (* e * 1 = e | 1 * e = e *)
-  | Binop ("*", e, Int 1)
-  | Binop ("*", Int 1, e) -> simplify e
+  | App (App (Var "*", e), Int 1)
+  | App (App (Var "*", Int 1), e) -> simplify e
   (* e / 1 = e *)
-  | Binop ("/", e, Int 1) -> simplify e
+  | App (App (Var "/", e), Int 1) -> simplify e
   (* x / x = 1 *)
-  | Binop ("/", Var x, Var y) when x = y -> Int 1
+  | App (App (Var "/", Var x), Var y) when x = y -> Int 1
   | e -> e
 
 let constant_fold first_pass next_pass = function
-  | Binop ("+",  Int a, Int b) -> first_pass (Int (a + b))
-  | Binop ("-",  Int a, Int b) -> first_pass (Int (a - b))
-  | Binop ("*",  Int a, Int b) -> first_pass (Int (a * b))
-  | Binop ("/",  Int a, Int b) -> first_pass (Int (a / b))
-  | Binop ("=",  Int a, Int b) -> first_pass (Bool (a = b))
-  | Binop ("<>", Int a, Int b) -> first_pass (Bool (a <> b))
-  | Binop ("<",  Int a, Int b) -> first_pass (Bool (a < b))
-  | Binop (">",  Int a, Int b) -> first_pass (Bool (a > b))
-  | Binop ("<=", Int a, Int b) -> first_pass (Bool (a <= b))
-  | Binop (">=", Int a, Int b) -> first_pass (Bool (a >= b))
+  | App (App (Var "+",  Int a), Int b) -> first_pass (Int (a + b))
+  | App (App (Var "-",  Int a), Int b) -> first_pass (Int (a - b))
+  | App (App (Var "*",  Int a), Int b) -> first_pass (Int (a * b))
+  | App (App (Var "/",  Int a), Int b) -> first_pass (Int (a / b))
+  | App (App (Var "=",  Int a), Int b) -> first_pass (Bool (a = b))
+  | App (App (Var "<>", Int a), Int b) -> first_pass (Bool (a <> b))
+  | App (App (Var "<",  Int a), Int b) -> first_pass (Bool (a < b))
+  | App (App (Var ">",  Int a), Int b) -> first_pass (Bool (a > b))
+  | App (App (Var "<=", Int a), Int b) -> first_pass (Bool (a <= b))
+  | App (App (Var ">=", Int a), Int b) -> first_pass (Bool (a >= b))
   | e -> next_pass (simplify e)
 
 let eliminate_redundant_let first_pass next_pass = function

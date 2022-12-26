@@ -5,9 +5,10 @@ Program
     │   ├── a: int
     │   └── Fun
     │       ├── b: int
-    │       └── Binop
-    │           ├── (+)
-    │           ├── Var: a
+    │       └── App
+    │           ├── App
+    │           │   ├── Var: +
+    │           │   └── Var: a
     │           └── Var: b
     └── Let
         ├── a

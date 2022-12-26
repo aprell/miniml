@@ -2,6 +2,9 @@ open Ast
 open Typecheck
 open Optim
 
+let is_primitive op =
+  List.mem op ["+"; "-"; "*"; "/"; "="; "<>"; "<"; ">"; "<="; ">="]
+
 let apply = function
   | "+",  Value.Int a, Value.Int b -> Value.Int (a + b)
   | "-",  Value.Int a, Value.Int b -> Value.Int (a - b)
@@ -24,15 +27,11 @@ let rec eval' env = function
   | Bool n -> Value.Bool n
   | Unit -> Value.Unit
   | Var x -> !(lookup x env)
-  | Binop (op, e1, e2) ->
-    let e1' = eval' env e1 in
-    let e2' = eval' env e2 in
-    apply (op, e1', e2')
   | Let ((x, _), e1, e2) ->
     let e1' = eval' env e1 in
     eval' ((x, ref e1') :: env) e2
   | Letrec ((x, _), e1, e2) ->
-    (* Bind x to dummy value *)
+    (* Bind x to placeholder *)
     let env' = (x, ref (Value.Bool false)) :: env in
     let e1' = eval' env' e1 in
     (* Backpatch x with function closure *)
@@ -45,6 +44,10 @@ let rec eval' env = function
       | _ -> eval' env e3
     end
   | Fun ((x, _), e) -> Value.Fun (x, e, env)
+  | App (App (Var op, e1), e2) when is_primitive op ->
+    let e1' = eval' env e1 in
+    let e2' = eval' env e2 in
+    apply (op, e1', e2')
   | App (e1, e2) ->
     let e1' = eval' env e1 in
     let e2' = eval' env e2 in
@@ -59,11 +62,6 @@ let rec emit = function
   | Bool false -> "false"
   | Unit -> "nil"
   | Var x -> x
-  | Binop (op, e1, e2) ->
-    let e1' = emit e1 in
-    let e2' = emit e2 in
-    Printf.sprintf "(%s %s %s)"
-      e1' (match op with | "=" -> "==" | "<>" -> "~=" | _ -> op) e2'
   | Let ((x, _), e1, e2) ->
     let e1' = emit e1 in
     let e2' = emit e2 in
@@ -80,6 +78,11 @@ let rec emit = function
   | Fun ((x, _), e) ->
     let e' = emit e in
     Printf.sprintf "function (%s) return %s end" x e'
+  | App (App (Var op, e1), e2) when is_primitive op ->
+    let e1' = emit e1 in
+    let e2' = emit e2 in
+    Printf.sprintf "(%s %s %s)"
+      e1' (match op with | "=" -> "==" | "<>" -> "~=" | _ -> op) e2'
   | App (e1, e2) ->
     let e1' = emit e1 in
     let e2' = emit e2 in
