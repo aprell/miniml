@@ -11,11 +11,11 @@ Build miniml by typing `make`, or simply run `./miniml`.
 miniml can generate Lua code:
 
 ```
-./miniml -c examples/fact.miniml
+$ ./miniml -c examples/fact.miniml
 print((function (fact_) fact = fact_ return (fact)(10) end)(function (x)
-return ((x < 1) and 1 or (x * (fact)((x - 1)))) end))
+return ((x < 2) and 1 or (x * (fact)((x - 1)))) end))
 
-./miniml -c examples/fact.miniml | lua
+$ ./miniml -c examples/fact.miniml | lua
 3628800
 ```
 
