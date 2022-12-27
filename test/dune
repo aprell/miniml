@@ -5,5 +5,5 @@
 
 (executable
   (name test)
-  (modules test)
+  (modules test utils)
   (libraries miniml))
