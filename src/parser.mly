@@ -30,7 +30,12 @@
 %nonassoc INT BOOL VAR LPAREN
 %nonassoc APP
 
-%start <Ast.expr> prog
+%type <Ast.expr> prog expr
+%type <Ast.name * Type.t> param
+%type <(Ast.name * Type.t) list> param_list
+%type <Type.t> type_annot type_name
+
+%start prog
 
 %%
 
