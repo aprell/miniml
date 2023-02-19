@@ -3,6 +3,7 @@
 %}
 
 %token <int> INT
+%token <bool> BOOL
 %token <string> VAR
 %token UNARY_MINUS
 %token PLUS MINUS
@@ -11,7 +12,6 @@
 %token EQ NE LT GT LE GE
 %token LET REC IN
 %token IF THEN ELSE
-%token TRUE FALSE
 %token FUN
 %token ARROW DARROW
 %token COLON COMMA
@@ -27,7 +27,7 @@
 %left PLUS MINUS
 %left TIMES DIV
 %right UNARY_MINUS
-%nonassoc VAR INT FALSE TRUE LPAREN
+%nonassoc INT BOOL VAR LPAREN
 %nonassoc APP
 
 %start <Ast.expr> prog
@@ -39,19 +39,18 @@ prog:
   ;
 
 expr:
-  | INT                                        { Int $1 }
-  | VAR                                        { Var $1 }
-  | TRUE                                       { Bool true }
-  | FALSE                                      { Bool false }
-  | LPAREN RPAREN                              { Unit }
-  | UNARY_MINUS expr                           { App (App (Var "-", Int 0), $2) }
-  | expr binop expr                            { App (App (Var $2, $1), $3) }
-  | LET VAR type_annot? EQ expr IN expr        { Let (($2, $3), $5, $7) }
-  | LET REC VAR type_annot EQ expr IN expr     { Letrec (($3, $4), $6, $8) }
-  | IF expr THEN expr ELSE expr %prec IF       { If ($2, $4, $6) }
-  | FUN param_list DARROW expr %prec FUN       { `Fun ($2, $4) |> desugar }
-  | expr expr %prec APP                        { App ($1, $2) }
-  | LPAREN expr RPAREN                         { $2 }
+  | INT                                       { Int $1 }
+  | BOOL                                      { Bool $1 }
+  | VAR                                       { Var $1 }
+  | LPAREN RPAREN                             { Unit }
+  | UNARY_MINUS expr                          { App (App (Var "-", Int 0), $2) }
+  | expr binop expr                           { App (App (Var $2, $1), $3) }
+  | LET VAR type_annot? EQ expr IN expr       { Let (($2, $3), $5, $7) }
+  | LET REC VAR type_annot EQ expr IN expr    { Letrec (($3, $4), $6, $8) }
+  | IF expr THEN expr ELSE expr %prec IF      { If ($2, $4, $6) }
+  | FUN param_list DARROW expr %prec FUN      { `Fun ($2, $4) |> desugar }
+  | expr expr %prec APP                       { App ($1, $2) }
+  | LPAREN expr RPAREN                        { $2 }
   ;
 
 param_list:

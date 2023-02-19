@@ -18,40 +18,40 @@ let comment = '#' [^ '\n']*
 let newline = '\n'
 let alpha = ['A'-'Z' 'a'-'z']
 let digit = ['0'-'9']
-let int = digit+
-let ident = ('_' | alpha) ('_' | alpha | digit)*
+let integer = digit+
+let boolean = "true" | "false"
+let identifier = ('_' | alpha) ('_' | alpha | digit)*
 
 rule read = parse
   | whitespace
-  | comment     { read lexbuf }
-  | newline     { Lexing.new_line lexbuf; read lexbuf }
-  | "~"         { UNARY_MINUS }
-  | "+"         { PLUS }
-  | "-"         { MINUS }
-  | "*"         { TIMES }
-  | "/"         { DIV }
-  | "="         { EQ }
-  | "<>"        { NE }
-  | "<"         { LT }
-  | ">"         { GT }
-  | "<="        { LE }
-  | ">="        { GE }
-  | "let"       { LET }
-  | "rec"       { REC }
-  | "in"        { IN }
-  | "if"        { IF }
-  | "then"      { THEN }
-  | "else"      { ELSE }
-  | "true"      { TRUE }
-  | "false"     { FALSE }
-  | "fun"       { FUN }
-  | "->"        { ARROW }
-  | "=>"        { DARROW }
-  | ":"         { COLON }
-  | ","         { COMMA }
-  | "("         { LPAREN }
-  | ")"         { RPAREN }
-  | ident as id { VAR id }
-  | int as i    { INT (int_of_string i) }
-  | eof         { EOF }
-  | _           { lexing_error lexbuf }
+  | comment            { read lexbuf }
+  | newline            { Lexing.new_line lexbuf; read lexbuf }
+  | "~"                { UNARY_MINUS }
+  | "+"                { PLUS }
+  | "-"                { MINUS }
+  | "*"                { TIMES }
+  | "/"                { DIV }
+  | "="                { EQ }
+  | "<>"               { NE }
+  | "<"                { LT }
+  | ">"                { GT }
+  | "<="               { LE }
+  | ">="               { GE }
+  | "let"              { LET }
+  | "rec"              { REC }
+  | "in"               { IN }
+  | "if"               { IF }
+  | "then"             { THEN }
+  | "else"             { ELSE }
+  | "fun"              { FUN }
+  | "->"               { ARROW }
+  | "=>"               { DARROW }
+  | ":"                { COLON }
+  | ","                { COMMA }
+  | "("                { LPAREN }
+  | ")"                { RPAREN }
+  | integer as i       { INT (int_of_string i) }
+  | boolean as b       { BOOL (bool_of_string b) }
+  | identifier as n    { VAR n }
+  | eof                { EOF }
+  | _                  { lexing_error lexbuf }
